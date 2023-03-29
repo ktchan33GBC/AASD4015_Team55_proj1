@@ -14603,13 +14603,15 @@ body[data-format='mobile'] .jp-OutputArea-child .jp-OutputArea-output {
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <p>Introduction:</p>
-<p>For this project we would use the CIFAR10 dataset</p>
-<p>We first import VGG16 pretained model, and fine tuned the architect for our dataset. and we compare mparing the accuarcy and speed of the models</p>
+<p>Transfer learning and Fine-tuning pre-trained model is very common in image classifications.
+For this project, we are fine-tuning a pre-trained VGG-16 model with the CIFAR 10 dataset which consists of 6000 images per class. We would like to examine the importance of unfreezing the layers in sequential orders versus unfreezing them altogether. We would compare the testing accuracy, speed of training as well as the average precision score of each of the output classes. 
+For the first model, we will modify the fully connected layers for the classification of 10 classes in the dataset of interest, then unfreeze the top 2 CNN blocks in sequential orders for training. 
+For the second model, we will modify the fully connected layers and unfreeze the top 2 CNN blocks altogether. The summary is as below:</p>
 
-<pre><code>Model 1a: Training from the Fully Connected Network onwards
-Model 1b: Un-freezing &amp; training on the LAST CNN block onwards
-Model 1c: Un-freezing &amp; training on the LAST TWO CNN block onwards
-Model 2 : unfreezing the last fully connected layers and the last 2 blocks together
+<pre><code>Model 1a: Training from the Fully Connected Network onwardsTraining from the Fully Connected Network onwards (starting from VGG-16)
+Model 1b: Un-freezing &amp; training on the LAST CNN block onwards (starting from 1a)
+Model 1c: Un-freezing &amp; training on the LAST TWO CNN block onwards (starting from 1b)
+Model 2 : unfreezing the last fully connected layers and the last 2 blocks together (starting from VGG-16)
 
 </code></pre>
 <p>CIFAR10 dataset link: <a href="https://www.cs.toronto.edu/~kriz/cifar.html">https://www.cs.toronto.edu/~kriz/cifar.html</a></p>
@@ -17330,22 +17332,70 @@ jp-needs-light-background
 
 </div>
 
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-     <div class="CodeMirror cm-s-jupyter">
-<div class=" highlight hl-ipython3"><pre><span></span> 
-</pre></div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>Discussion of Results</p>
 
-     </div>
 </div>
 </div>
 </div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>Loss against epoch</p>
+<ul>
+<li>For model 1a, we can see that the validation loss starts increasing from epoch 3 to 5 (a small U-shaped curve) while the training loss keeps decreasing. This may give us some hint of overfitting although it is difficult to conclude with limited epochs (since we have limited computation resources)</li>
+<li>From model 1b,  we can see that the validation loss continued to increase from 0.5 to 0.7 while the training loss dropped, illustrating a divergence and further solidifying the possibility of over-fitting of data.</li>
+<li>Similar to model 1b, it is observed in model 1c a divergence of training loss and validation loss. Therefore we are quite sure that the data might be overfitting.</li>
+<li>From model 2, the training loss is fluctuating from epoch1 around a similar level with an increase in validation loss. This observation is uncommon and we are not sure about the reasons behind it. One possibility could be the unstable results due to training</li>
+</ul>
 
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>Accuracy and Precision Score by class</p>
+<ul>
+<li>The accuracy of model 1a, 1b, 1c and model 2 are at similar level of 83% to 84%. Therefore, we are confident to conclude that unfreezing the convolution neural network blocks does not further improve the accuracy of the classification model regardless of doing it sequentially or simultaneously.</li>
+<li>We attribute this phenomenon to the relatively simple dataset we chose. The feature extraction layers/blocks in the VGG-16 may already be sufficient with easily distinguishable classes (e.g. automobile / airplane), which means that unfreezing the CNN blocks does not lead to a significant update of the weights in these layers. </li>
+<li>Mean Precision score (area under the precision-recall curve) of class 3 (image of cats, ~80%) and class 5 (dogs, 87%) are class especially low compared to other classes. One of the possible reasons could be more common spatial features are shared between them, compared to other classes.</li>
+</ul>
+
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>Training speed</p>
+<ul>
+<li>It is surprising that the training time elapsed of model 2 is similar to each of the model 1a,1b, 1c with significantly more parameters.</li>
+<li>To further investigate, we could choose a more challenging images dataset, with classes that are more similar in their spatial features e.g. human faces or faces from whom with similar appearance e.g. Morgan Freeman vs Nelson Mandela</li>
+<li>Moreover, the images are only 224*224 which is relatively small in image classification. We could potentially use image datasets of higher resolution for further investigation which may require more feature extraction layers to extract more high-level / specific features.</li>
+</ul>
+
+</div>
+</div>
+</div>
 </div>
 </body>
 
